@@ -7,7 +7,9 @@ from pymongo.errors import DuplicateKeyError
 from pymongo.read_preferences import ReadPreference
 import time
 import utils
+import pymongo
 from utils import auto_retry, log_exceptions, squelch_keyboard_interrupt
+
 
 log = utils.get_logger(__name__)
 
@@ -93,6 +95,10 @@ def copy_collection(source, dest, state_path, percent):
                                         max_pool_size=30,
                                         read_preference=ReadPreference.SECONDARY,
                                         document_class=FasterOrderedDict)
+    # Auth
+    database = source_client[source['db']]
+    database.authenticate('clone_collection','2dB9K6c5az')
+
 
     source_collection = source_client[source['db']][source['collection']]
     if source_client.is_mongos:
@@ -102,10 +108,22 @@ def copy_collection(source, dest, state_path, percent):
     dest_client = utils.mongo_connect(dest['host'], dest['port'],
                                       max_pool_size=30,
                                       document_class=FasterOrderedDict)
+
+
+    # Auth
+    database = dest_client[dest['db']]
+    database.authenticate('clone_collection','2dB9K6c5az')
+
     dest_collection = dest_client[dest['db']][dest['collection']]
 
     # record timestamp of last oplog entry, so that we know where to start applying ops
     # later
+
+    # Auth
+    database = source_client['local']
+    database.authenticate('clone_collection','2dB9K6c5az')
+
+
     oplog_ts = utils.get_last_oplog_entry(source_client)['ts']
     state_db.update_oplog_ts(source, dest, oplog_ts)
 
@@ -175,9 +193,19 @@ def copy_indexes(source, dest):
                                         ensure_direct=True,
                                         max_pool_size=1,
                                         read_preference=ReadPreference.SECONDARY)
+    # Auth
+    database = source_client[source['db']]
+    database.authenticate('clone_collection','2dB9K6c5az')
+
     source_collection = source_client[source['db']][source['collection']]
 
     dest_client = utils.mongo_connect(dest['host'], dest['port'], max_pool_size=1)
+
+    # Auth
+    database = dest_client[dest['db']]
+    database.authenticate('clone_collection','2dB9K6c5az')
+
+
     dest_collection = dest_client[dest['db']][dest['collection']] 
 
     # copy indices

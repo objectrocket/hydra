@@ -75,6 +75,13 @@ if __name__ == '__main__':
                                         max_pool_size=POOL_SIZE,
                                         read_preference=ReadPreference.SECONDARY_PREFERRED,
                                         document_class=FasterOrderedDict)
+
+    # Auth
+
+    database = source_client[source['db']]
+    database.authenticate('clone_collection','2dB9K6c5az')
+    
+
     source_collection = source_client[source['db']][source['collection']]
     if not source_client.is_mongos or source_client.is_primary:
         raise Exception("source must be a mongos instance or a primary")
@@ -84,6 +91,13 @@ if __name__ == '__main__':
     dest_client = utils.mongo_connect(dest['host'], dest['port'],
                                       max_pool_size=POOL_SIZE,
                                       document_class=FasterOrderedDict)
+ 
+    # Auth
+
+    database = dest_client[dest['db']]
+    database.authenticate('clone_collection','2dB9K6c5az')
+
+
     dest_collection = dest_client[dest['db']][dest['collection']]
 
     if source == dest:

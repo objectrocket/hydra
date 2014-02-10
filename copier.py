@@ -218,9 +218,14 @@ def copy_indexes(source, dest):
             elif k == 'v':
                 continue
             elif k == 'key':
-                # sometimes, pymongo will give us floating point numbers, so let's make sure
-                # they're ints instead
-                index_key = [(field, int(direction)) for (field, direction) in v]
+		for ( field, direction) in v:
+		    if isinstance(direction, basestring):
+		        # Make sure if hashed/etc is specified we don't cast to int
+		        index_key = [(field, direction) for (field, direction) in v]
+		    else:  
+                    	# sometimes, pymongo will give us floating point numbers, so let's make sure
+                    	# they're ints instead
+                        index_key = [(field, int(direction)) for (field, direction) in v]
             else:
                 raise NotImplementedError("don't know how to handle index info key %s" % k)
             # TODO: there are other index options that probably aren't handled here

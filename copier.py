@@ -213,7 +213,7 @@ def copy_indexes(source, dest):
         kwargs = { 'name': name }
         index_key = None
         for k, v in index.items():
-            if k in ['unique', 'sparse']:
+            if k in ['background', 'unique', 'sparse']:
                 kwargs[k] = v
             elif k == 'v':
                 continue
@@ -222,7 +222,7 @@ def copy_indexes(source, dest):
 		    if isinstance(direction, basestring):
 		        # Make sure if hashed/etc is specified we don't cast to int
 		        index_key = [(field, direction) for (field, direction) in v]
-		    else:  
+		    else:
                     	# sometimes, pymongo will give us floating point numbers, so let's make sure
                     	# they're ints instead
                         index_key = [(field, int(direction)) for (field, direction) in v]

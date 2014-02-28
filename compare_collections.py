@@ -207,30 +207,21 @@ def compare_collections(source, dest, percent, error_bp, recent_ops, ids_file):
 
     # setup client connections
     source_client = utils.mongo_connect(source['host'], source['port'],
+                                        source['user'], source['password'], source['authDB'],
                                         ensure_direct=True,
                                         max_pool_size=POOL_SIZE,
                                         slave_okay=True,
                                         document_class=dict)
-
-    #Auth
-
-    database = source_client[source['db']]
-    database.authenticate('clone_collection','2dB9K6c5az')
      
 
     source_collection = source_client[source['db']][source['collection']]
 
     dest_client = utils.mongo_connect(dest['host'], dest['port'],
+                                      dest['user'], dest['password'], dest['authDB'],
                                       ensure_direct=True,
                                       max_pool_size=POOL_SIZE,
                                       slave_okay=True,
                                       document_class=dict)
-
-    #Auth
-
-    database = dest_client[dest['db']]
-    database.authenticate('clone_collection','2dB9K6c5az')
- 
 
     dest_collection = dest_client[dest['db']][dest['collection']]
 

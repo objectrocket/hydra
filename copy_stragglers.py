@@ -71,16 +71,12 @@ if __name__ == '__main__':
     # connect to source and destination
     source = utils.parse_mongo_url(args.source)
     source_client = utils.mongo_connect(source['host'], source['port'],
+                                        source['user'], source['password'], source['authDB'],
                                         ensure_direct=True,
                                         max_pool_size=POOL_SIZE,
                                         read_preference=ReadPreference.SECONDARY_PREFERRED,
                                         document_class=FasterOrderedDict)
 
-    # Auth
-
-    database = source_client[source['db']]
-    database.authenticate('clone_collection','2dB9K6c5az')
-    
 
     source_collection = source_client[source['db']][source['collection']]
     if not source_client.is_mongos or source_client.is_primary:
@@ -89,14 +85,9 @@ if __name__ == '__main__':
 
     dest = utils.parse_mongo_url(args.dest)
     dest_client = utils.mongo_connect(dest['host'], dest['port'],
+                                      dest['user'], dest['password'], dest['authDB'],
                                       max_pool_size=POOL_SIZE,
                                       document_class=FasterOrderedDict)
- 
-    # Auth
-
-    database = dest_client[dest['db']]
-    database.authenticate('clone_collection','2dB9K6c5az')
-
 
     dest_collection = dest_client[dest['db']][dest['collection']]
 

@@ -178,15 +178,19 @@ def apply_oplog(source, dest, percent, state_path):
 
     # connect to mongo
     source_client = utils.mongo_connect(source['host'], source['port'],
+                                        source['user'], source['password'], source['authDB'],
                                         ensure_direct=True,
                                         max_pool_size=30,
                                         read_preference=ReadPreference.SECONDARY,
                                         document_class=FasterOrderedDict)
+
     source_collection = source_client[source['db']][source['collection']]
 
     dest_client = utils.mongo_connect(dest['host'], dest['port'],
+                                      dest['user'], dest['password'], dest['authDB'],
                                       max_pool_size=30,
                                       document_class=FasterOrderedDict)
+
     dest_collection = dest_client[dest['db']][dest['collection']] 
     oplog = source_client['local']['oplog.rs']
 

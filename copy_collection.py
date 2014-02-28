@@ -32,7 +32,8 @@ def die(msg):
 
 
 def ensure_empty_dest(dest):
-    client = utils.mongo_connect(dest['host'], dest['port'],
+    client = utils.mongo_connect(dest['host'], dest['port'], 
+                                 dest['user'],dest['password'],dest['authDB'],
                                  ensure_direct=True,
                                  max_pool_size=1,
                                  read_preference=ReadPreference.PRIMARY)
@@ -155,6 +156,15 @@ if __name__ == '__main__':
         '--dest', type=str, required=True, metavar='URL',
         help='source to read from; see --source for format')
     parser.add_argument(
+        '--user', type=str, required=False, metavar='USER',
+        help='User to auth with, not required')
+    parser.add_argument(
+        '--password', type=str, required=False, metavar='PASSWORD',
+        help='Pass word for the auth to use')
+    parser.add_argument(
+        '--authDB', type=str, required=False, metavar='AUTHDB',
+        help='Database to auth against')
+    parser.add_argument(
         '--percent', type=int, metavar='PCT', default=None,
         help='copy only PCT%% of data')
     parser.add_argument(
@@ -167,10 +177,19 @@ if __name__ == '__main__':
 
     # parse source and destination
     dest = utils.parse_mongo_url(args.dest)
+    dest['user'] = args.user if 'user' in args else False
+    dest['password'] = args.password if 'password' in args else False
+    dest['authDB'] = args.authdb if 'authdb' in args else False
+
     if os.path.exists(args.source):
         sources = utils.parse_source_file(args.source)
     else:
         sources = [utils.parse_mongo_url(args.source)]
+
+    for source in sources:
+        source['user'] = args.user if 'user' in args else False
+        source['password'] = args.password if 'password' in args else False
+        source['authDB'] = args.authdb if 'authdb' in args else False
 
     # initialize sqlite database that holds our state (this may seem like overkill,
     # but it's actually needed to ensure proper synchronization of subprocesses)

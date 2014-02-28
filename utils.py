@@ -31,7 +31,7 @@ def get_logger(name):
 log = get_logger("utils")
 
 
-def mongo_connect(host, port, ensure_direct=False, secondary_only=False, max_pool_size=1,
+def mongo_connect(host, port, user, password, authDB, ensure_direct=False, secondary_only=False, max_pool_size=1,
                   socketTimeoutMS=None, w=0, read_preference=None, document_class=dict,
                   replicaSet=None, slave_okay=None):
     """
@@ -41,7 +41,11 @@ def mongo_connect(host, port, ensure_direct=False, secondary_only=False, max_poo
 
     @param host            host to connect to
     @param port            port to connect to
+    @param user            user to connect with
+    @param password        password to user with user
+    @param authDB          database to auth when authing
     @param ensure_direct   do safety checks to ensure we are connected to specified mongo instance
+
 
     most other keyword arguments mirror those for pymongo.MongoClient
     """
@@ -60,7 +64,16 @@ def mongo_connect(host, port, ensure_direct=False, secondary_only=False, max_poo
     if slave_okay is not None:
         options['slave_okay'] = slave_okay
     client = pymongo.MongoClient(**options)
-
+    
+    if authDB:
+        # try and auth to the provided database error otherwise
+        try:
+            client[authDB].authenticate(user,password)
+        except Exception,e:
+            log = get_logger("utils")
+            log.error("Unable to auth on %s:%s" % (host,port))
+            sys.exit(1)
+    
     if ensure_direct:
         # make sure we are connected to mongod/mongos that was specified; mongodb drivers
         # have the tendency of doing "magical" things in terms of connecting to other boxes
@@ -70,6 +83,7 @@ def mongo_connect(host, port, ensure_direct=False, secondary_only=False, max_poo
         if connection.host != host or connection.port != port:
             raise ValueError("connected to %s:%d (expected %s:%d)" %
                              (connection.host, connection.port, host, port))
+  
 
     return client
 

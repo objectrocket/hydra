@@ -89,6 +89,7 @@ def copy_collection(source, dest, state_path, percent):
 
     # connect to mongo
     source_client = utils.mongo_connect(source['host'], source['port'],
+                                        source['user'], source['password'], source['authDB'],
                                         ensure_direct=True,
                                         max_pool_size=30,
                                         read_preference=ReadPreference.SECONDARY,
@@ -100,12 +101,15 @@ def copy_collection(source, dest, state_path, percent):
                         source['host'], source['port'])
 
     dest_client = utils.mongo_connect(dest['host'], dest['port'],
+                                      dest['user'], dest['password'], dest['authDB'],
                                       max_pool_size=30,
                                       document_class=FasterOrderedDict)
+
     dest_collection = dest_client[dest['db']][dest['collection']]
 
     # record timestamp of last oplog entry, so that we know where to start applying ops
     # later
+
     oplog_ts = utils.get_last_oplog_entry(source_client)['ts']
     state_db.update_oplog_ts(source, dest, oplog_ts)
 
@@ -172,12 +176,17 @@ def copy_indexes(source, dest):
     """
     # connect to mongo instances
     source_client = utils.mongo_connect(source['host'], source['port'],
+                                        source['user'], source['password'], source['authDB'],
                                         ensure_direct=True,
                                         max_pool_size=1,
                                         read_preference=ReadPreference.SECONDARY)
     source_collection = source_client[source['db']][source['collection']]
 
-    dest_client = utils.mongo_connect(dest['host'], dest['port'], max_pool_size=1)
+    dest_client = utils.mongo_connect(dest['host'], dest['port'],
+                                      dest['user'], dest['password'], dest['authDB'], 
+                                      max_pool_size=1)
+
+    
     dest_collection = dest_client[dest['db']][dest['collection']] 
 
     # copy indices

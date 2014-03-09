@@ -89,12 +89,14 @@ def copy_collection_parent(sources, dest, state_db, args):
     # -----------------------------------------------------------------------
     # build indices on main process, since that only needs to be done once
     # -----------------------------------------------------------------------
-    waiting_for_indices = len(state_db.select_by_state(CopyStateDB.STATE_WAITING_FOR_INDICES))
-    if waiting_for_indices and waiting_for_indices < len(sources):
-        die("not all initial copies have been completed; rerun with --restart")
-    if waiting_for_indices > 0:
-        log.info("building indices")
-        copier.copy_indexes(sources[0], dest)
+    # Completely skip the indexing portion
+	log.info("Skipping index build for safety")	
+    #waiting_for_indices = len(state_db.select_by_state(CopyStateDB.STATE_WAITING_FOR_INDICES))
+    #if waiting_for_indices and waiting_for_indices < len(sources):
+    #    die("not all initial copies have been completed; rerun with --restart")
+    #if waiting_for_indices > 0:
+    #    log.info("building indices")
+    #    copier.copy_indexes(sources[0], dest)
         for source in sources:
             state_db.update_state(source, dest, CopyStateDB.STATE_APPLYING_OPLOG)
 

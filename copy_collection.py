@@ -38,8 +38,9 @@ def ensure_empty_dest(dest):
                                  read_preference=ReadPreference.PRIMARY)
     collection = client[dest['db']][dest['collection']]
     if collection.count() > 0:
-        die("destination must be empty!")
-
+        #die("destination must be empty!")
+	#allow existing collections
+	log.info("Collection exists, proceeding anyway")
 
 def copy_collection_parent(sources, dest, state_db, args):
     """

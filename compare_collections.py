@@ -168,7 +168,10 @@ def _get_ids_for_recent_ops(client, recent_ops):
     """
     generator that yields the _id's that were touched by recent ops
     """
+    database = client['local']
+    database.authenticate('clone_collection','2dB9K6c5az')
     oplog = client['local']['oplog.rs']
+
     fields = ['o._id', 'o2._id', 'op']
     cursor = oplog.find(fields=fields)
     cursor.limit(recent_ops)

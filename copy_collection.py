@@ -17,6 +17,7 @@ from pymongo.read_preferences import ReadPreference
 import string
 import sys
 import utils
+import pymongo
 
 log = utils.get_logger(__name__)
 
@@ -37,8 +38,7 @@ def ensure_empty_dest(dest):
                                  ensure_direct=True,
                                  max_pool_size=1,
                                  read_preference=ReadPreference.PRIMARY)
-    collection = client[dest['db']][dest['collection']]
-    if collection.count() > 0:
+       if collection.count() > 0:
         die("destination must be empty!")
 
 

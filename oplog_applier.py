@@ -186,12 +186,17 @@ def apply_oplog(source, dest, percent, state_path):
 
     source_collection = source_client[source['db']][source['collection']]
 
+
     dest_client = utils.mongo_connect(dest['host'], dest['port'],
                                       dest['user'], dest['password'], dest['authDB'],
                                       max_pool_size=30,
                                       document_class=FasterOrderedDict)
 
     dest_collection = dest_client[dest['db']][dest['collection']] 
+
+    database = source_client['local']
+    database.authenticate('clone_collection','2dB9K6c5az')
+
     oplog = source_client['local']['oplog.rs']
 
     # print stats periodically

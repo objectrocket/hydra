@@ -77,6 +77,7 @@ def mongo_connect(host, port, user, password, authDB, ensure_direct=False, secon
     if ensure_direct:
         # make sure we are connected to mongod/mongos that was specified; mongodb drivers
         # have the tendency of doing "magical" things in terms of connecting to other boxes
+
         test_collection = client['local']['test']
         test_cursor = test_collection.find(slave_okay=True, limit=1)
         connection = test_cursor.collection.database.connection
